@@ -1,0 +1,350 @@
+import java.util.*;
+import java.util.Vector;
+
+class Diary{
+    private String date;
+    private String content;
+
+    Diary(String date, String content){
+        this.date = date;
+        this.content = content;
+    }
+    public String getDate(){
+        return this.date;
+    }
+    public String getcontent(){
+        return this.content;
+    }
+
+    @Override
+    public String toString(){
+        return "Date: " + date + "\n" + "Entry: " + content;
+    }
+}
+
+class DiaryManager{
+    private Vector<Diary> D;
+
+    public DiaryManager(){
+        D = new Vector<>();
+    }
+    //Operations to be conducted in Diary mode
+    public void insert(){
+        
+    }
+
+}
+
+class Journal{
+    private String label;
+    private String title;
+    private String content;
+    private String date;
+
+    Journal(String date, String title, String content, String label){
+        this.date = date;
+        this.title = title;
+        this.label = label;
+        this.content = content;
+    }
+
+    public String getTitle(){
+        return this.title;
+    }
+
+    public String getDate(){
+        return this.date;
+    }
+
+    public String getContent(){
+        return this.content;
+    }
+
+    public String getLabel(){
+        return this.label;
+    }
+
+    @Override
+    public String toString(){
+        return "Label: " + label + "\n" + "Title: " + title + "\n" + "Content: " + content + "\n" + "Date: " + date + "\n";
+    }
+}
+
+class JournalManager{
+    private Vector<Vector<Journal>> journalLabels; //Multidimensional vector for labels and notes
+    private Vector<String> labels; //Vector to store label names
+    private Scanner sc;
+
+    public JournalManager(){
+        journalLabels = new Vector<>();
+        labels = new Vector<>(); //Initialize labels vector
+        sc = new Scanner(System.in);
+    }
+
+    //Method to create a new label
+    public void createLabel(){
+        System.out.print("Enter the label name: ");
+        String labelName = sc.nextLine();
+        
+        // Create a new vector for the notes under this label
+        Vector<Journal> notesUnderLabel = new Vector<>();
+        
+        //Add the new notes vector to the journalLabels
+        journalLabels.add(notesUnderLabel);
+        
+        //Add the label name to the labels vector
+        labels.add(labelName);
+        
+        System.out.println("Label '" + labelName + "' created.");
+    }
+
+    //Method to create a new note under a specific label by name
+    public void createNote() {
+        System.out.print("Enter the name of the label in which you want to create a note: ");
+        String labelName = sc.nextLine();
+
+        int index = labels.indexOf(labelName); //store the index of the 'label' entered by the user
+
+        if(index == -1){ //Label not found
+            System.out.println("Label '" + labelName + "' does not exist.");
+            return;
+        }
+
+        System.out.print("Enter the date: ");
+        String date = sc.nextLine();
+        
+        System.out.print("Enter the title: ");
+        String title = sc.nextLine();
+
+        System.out.print("Enter the content: ");
+        String content = sc.nextLine();
+
+        //Create a new Journal object
+        Journal newNote = new Journal(date, title, content, labelName);
+        
+        //Add the note to the corresponding label's vector
+        journalLabels.get(index).add(newNote);
+        
+        System.out.println("Note added under Label '" + labelName + "'.");
+    }
+
+    //Method to display note of the label entered by the user: 
+    public void displayNote(){
+        System.out.print("Enter the label you want to view: ");
+        String labelToView = sc.nextLine();
+        
+        //Find the index of the label
+        int index = labels.indexOf(labelToView);
+        
+        if (index == -1) { //Label not found
+            System.out.println("Label '" + labelToView + "' does not exist.");
+            return;
+        }
+    
+        //Retrieve the vector of Journals for this label
+        Vector<Journal> notesUnderLabel = journalLabels.get(index);
+        
+        //Check if there are any notes under this label
+        if(notesUnderLabel.isEmpty()){
+            System.out.println("No notes found under Label '" + labelToView + "'.");
+            return;
+        }
+    
+        //Display all notes under this label
+        System.out.println("Notes under Label '" + labelToView + "':");
+        for (Journal note : notesUnderLabel){//using enhanced for loop
+            System.out.println(note); //This will use the toString() method of Journal
+        }
+    }
+
+    public void Deletenote(){
+        System.out.print("Enter the label you want to view: ");
+        String note_delete = sc.nextLine();
+
+        int index = labels.indexOf(note_delete);
+
+        Vector<Journal> notesUnderLabel = journalLabels.get(index);
+        int i;
+        for (i=0; i<notesUnderLabel.size(); i++){
+            if (notesUnderLabel.get(i).getTitle().equalsIgnoreCase(note_delete)){
+                notesUnderLabel.remove(i);
+                System.out.println("Deleted not : " + note_delete);
+                return;
+            }
+        }
+    }
+
+    public void DeleteLabel(){
+        System.out.print("Enter the label you want to view: ");
+        String label_delete = sc.nextLine();
+
+        int index = labels.indexOf(label_delete);
+
+        Vector<Journal> notesUnderLabel = journalLabels.get(index);
+        int i;
+        for (i=0; i<notesUnderLabel.size(); i++){
+            if (notesUnderLabel.get(i).getTitle().equalsIgnoreCase(label_delete)){
+                notesUnderLabel.remove(i);
+                System.out.println("Deleted not : " + label_delete);
+                return;
+            }
+        }
+    }
+}
+
+public class DigitalDiary {
+    public static void main(String[] args){
+
+        JournalManager J = new JournalManager();
+        
+        Scanner sc = new Scanner(System.in);
+        int exitProgram = 0;  //This will control when to exit the entire program
+
+        while(exitProgram == 0){ 
+            String mainchoice;
+            System.out.print("Enter your application mode (D for Diary, J for Journal, E to Exit): ");
+            mainchoice = sc.nextLine();
+
+            if (mainchoice.equals("D")) {
+                int n = 1;
+                int ch1;
+                //diary mode functionalities
+                while (n == 1) {
+                    System.out.println("Operation on diary: ");
+                    System.out.println("1. Add entry\n2. Delete entry\n3. Display all entries and exit");
+                    ch1 = sc.nextInt();
+                    sc.nextLine();  // Consuming the leftover newline
+                    switch (ch1) {
+                        case 1:
+                            System.out.println("Added entry");
+                            break;
+                        case 2:
+                            System.out.println("Deleted entry");
+                            break;
+                        case 3:
+                            n = 0;
+                            System.out.println("Display all entries");
+                            break;
+                        default:
+                            System.out.println("Invalid input");
+                    }
+                }
+            } 
+            else if (mainchoice.equals("J")) {
+                int b = 1;
+                int ch2;
+                /*
+                Switch case for journal: 
+                1)Create label
+                2)Create note under label
+                3)Display notes under label
+                4)Delete note
+                5)Delete label
+                6)Exit
+                */
+                //Journal mode functionalities
+                System.out.println("Following operations :");
+                System.out.println("1. Create Label\n2. Create note under label\n3. Display notes under label\n4. Delete note \n5. Delete label");
+                while (b == 1) {
+                    System.out.print("Operation You want to conduct on your Journal: ");
+                    ch2 = sc.nextInt();
+                    sc.nextLine(); 
+
+                    switch (ch2) {
+                        case 1://Create label
+                            System.out.println("Adding content...\n");
+                            J.createLabel();
+                            break;
+                        case 2://Create note
+                            System.out.println("Adding note...");
+                            J.createNote();
+                            break;
+                        case 3://Display notes
+                            System.out.println("Displaying notes under label...");
+                            J.displayNote();
+                            break;
+                        case 4://Delete note
+                            System.out.println("Deleting your note...");
+                            J.displayNote();
+                            break;
+                        case 5://Delete label
+                            System.out.println("Deleting label...");
+                            break;
+                        case 6://Exit
+                            b = 0;
+                            System.out.println("Exiting Journal mode....");
+                        default:
+                            System.out.println("Invalid input");
+                    }
+                }
+            } 
+            else if(mainchoice.equals("E")){
+                exitProgram = 1;  // Set the flag to exit the loop
+                System.out.println("Exiting the program...");
+            } 
+            else{
+                System.out.println("Invalid mode selected");
+            }
+        }
+
+        sc.close();
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+// public class DigitalDiary {
+//     public static void main(String[] args) {
+//         // Create a Scanner object
+//         Scanner scanner = new Scanner(System.in);
+
+//         // Prompt the user for input
+//         System.out.println("Enter your diary entry (type 'exit' to finish):");
+
+//         // Read user input until 'exit' is entered
+//         StringBuilder diaryEntry = new StringBuilder();
+//         String inputLine;
+
+//         //date entry - to be added
+//         //no need to increment the date
+//         //assume the user to be inconsistent
+//         //
+
+//         //Diary entry input from the user 
+//         while (true) {
+//             inputLine = scanner.nextLine();
+//             if (inputLine.equalsIgnoreCase("exit")) {
+//                 break; // Exit loop if user types 'exit'
+//             }
+//             diaryEntry.append(inputLine).append("\n"); // Append each line to diaryEntry
+//         }
+
+//         // Close the scanner
+//         scanner.close();
+
+//         // Print the complete diary entry
+//         System.out.println("Your Diary Entry:");
+//         System.out.println(diaryEntry.toString());
+//     }
+// }
+
+
+// Method to display all notes under each label
+    // public void displayNotes() {
+    //     for (int i = 0; i < journalLabels.size(); i++) {
+    //         System.out.println("Label " + labels.get(i) + ":");
+    //         for (Journal note : journalLabels.get(i)) {
+    //             System.out.println(note);
+    //         }
+    //         System.out.println();
+    //     }
+    // }
